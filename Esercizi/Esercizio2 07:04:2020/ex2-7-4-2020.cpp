@@ -111,9 +111,28 @@ bool tutta_false(bool (*X)[6], int r) {
   return exit;
 }
 
+// PRE(X è una matrice bool)&&(B2 una array di int di grandezza 6)&&(dim il numero di righe di X)
 void percorri_cammino(bool (*X)[6], int B2[6], int dim) {
   bool stop = false;
-  cout << dim << endl;
+  // R1=(dim-1>=i>=0)
+  // 1.1) i=dim-1 => R1
+  // 1.2) R1&&(i>=0) => R1
+  // R2=(0<=j<6)&&(!stop)
+  // 2.1) (j=0)&&(!stop) => R2
+  // 2.2) se il valore nelle coordinate i,j di X è true ->
+  //    - se i!=dim-1 ->
+  //      -si,  se j==0->
+  //        - si, se almeno un elemento della riga sottostante in corrispondeza alla posizione sotto, sotto-destra è true ->
+  //          - si, il valore di B2 nella posizione i uguale a j, poi stop = true
+  //        - no, se j==5 ->
+  //          - si, se almeno un elemento della riga sottostandte in corrispondenza alla posizione sotto, sotto-sinistra ->
+  //            - si, il valore di B2 nella posizione i uguale a j, poi stop = true
+  //        - no ->
+  //          - se se almeno un elemento della riga sottostante in corrispondeza alla posizione sotto, sotto-destra, sotto-sinistra è true ->
+  //            - si, il valore di B2 nella posizione i uguale a j, poi stop = true
+  //      -no, il valore di B2 nella posizione i uguale a j, poi stop = true
+  // 2.3) R2&&(j=6) => POST2
+  // 1.3) R&&(i<0) => POST
   for (int i = dim - 1; i >= 0; i--) {
     stop = false;
     for (int j = 0; j < 6 && !stop; j++) {
@@ -136,12 +155,12 @@ void percorri_cammino(bool (*X)[6], int B2[6], int dim) {
             }
           }
         } else {
-          if (X[i][j]) {
-            B2[i] = j;
-            stop = true;
-          }
+          B2[i] = j;
+          stop = true;
         }
       }
     }
+    // POST2=(è stato rintracciata la colonna più a sinistra della riga i nella quale il percorso continua)
   }
 }
+// POST=(percorsa tutta X, B2 è stata riempita con le coordinate delle colonne rispettive all'indice di B2, le quali indicano il percorso percorribile più a sinistra)
