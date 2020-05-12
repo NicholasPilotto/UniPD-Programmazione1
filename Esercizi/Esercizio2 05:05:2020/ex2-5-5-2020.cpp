@@ -28,6 +28,7 @@ void stampa(nodo* X, int n) {
 }
 
 nodo* searchPath(int* X, int r, int c, int n);
+void destroy(nodo* x);
 
 int countDel = 0;
 int countNew = 0;
@@ -44,12 +45,11 @@ int main() {
   for (int i = 0; i < n; i++) {
     nodo* y = searchPath(B, 0, i, n);
 
-    if (y) {
-      if (!x) {
-        x = y;
-      } else if (y->val > x->val) {
-        x = y;
-      }
+    if (y && (!x || (y->val > x->val))) {
+      destroy(x);
+      x = y;
+    } else {
+      destroy(y);
     }
   }
 
@@ -59,7 +59,7 @@ int main() {
     cout << "non c'e' cammino" << endl;
   } else {
     stampa(x, 0);
-    countDel = countNew - 5;
+    //countDel = countNew - 5;
   }
   cout << "nodi creati=" << countNew << " nodi deallocati=" << countDel << endl;
   return 0;
@@ -73,7 +73,7 @@ nodo* searchPath(int* X, int r, int c, int n) {
   int val2 = 0;
   int val3 = 0;
 
-  if (c < 0 || !X[c + (r * n)] || c > n - 1) {
+  if (c == -1 || !X[c + (r * n)] || c == n) {
     return NULL;
   }
 
@@ -103,11 +103,26 @@ nodo* searchPath(int* X, int r, int c, int n) {
   }
 
   if (val1 >= val2 && val1 >= val3) {
+    destroy(tail2);
+    destroy(tail3);
     return new nodo(c, X[c + (r * n)] + val1, tail1);
   } else if (val2 >= val3) {
+    destroy(tail1);
+    destroy(tail3);
     return new nodo(c, X[c + (r * n)] + val2, tail2);
   }
+  destroy(tail1);
+  destroy(tail2);
   return new nodo(c, X[c + (r * n)] + val3, tail3);
+}
+
+void destroy(nodo* x) {
+  //la deallocazione di nodi superflui andrebbe effettuata in ogni esercizio
+  if (x) {
+    ++countDel;
+    destroy(x->next);
+    delete x;
+  }
 }
 // POST=
 //    Detto path il cammino più a sx tra i cammini (non contenenti 0) con il valore più alto che collegano B[row][col]
@@ -155,5 +170,6 @@ nodo* searchPath(int* X, int r, int c, int n) {
     Un ulteriore controllo viene fatto per controllare i valori dei singoloìi nodi ritoranti dalle chiamate ricorsive. Se essi sono valori validi, essi vengono allocati nella corrispettava
     variabile val_i (con 1<=i<=3).
     Per trovare il persorso più a sinistra, si controlla quale dei tre valori è il maggiore e, quando esso è stato trovato tra i tre valori, viene ritornato il nodo contenente la colonna corrente, 
-    il valore della cella corrente sommato a val_i (con val_i il valore del percorso a sinistra con valore maggiore)
+    il valore della cella corrente sommato a val_i (con val_i il valore del percorso a sinistra con valore maggiore) ed incrementata la variabile countNew, variabile utilizzata per il conteggio dei nodi allocati
+    nella memoria HEAP
 */
